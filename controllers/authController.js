@@ -3,6 +3,49 @@ const bcrypt = require('bcryptjs');
 const crypto=require('crypto');
 const jwt =require('jsonwebtoken');
 const sendEmail = require('../utils/sendEmail');
+const { OAuth2Client } = require('google-auth-library');
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);  
+
+const googleLogin = async(req,res)=>{
+  const{tokenId}=req.body;
+  try {
+    
+    const ticket = await client.verifyIdToken({
+      idToken: tokenId,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const { email, name, picture } = ticket.getPayload();
+
+    
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      
+      user = await User.create({
+        name,
+        email,
+        password: 'google-auth', 
+      });
+    }
+
+    
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: '7d',
+    });
+
+    res.json({ token, user: { name: user.name, email: user.email } });
+  } catch (error) {
+    console.error("Google Login Failed:", error);
+    res.status(400).json({ message: 'Google login failed' });
+  }
+};
+
+
+
+
+
 // registering user
 const registerUser=async(req,res)=>{
   const {name,email,password}=req.body
@@ -147,5 +190,6 @@ await user.save()
     res.status(500).json({ message: 'Could not reset password' });
   }
 };
+
 
 module.exports={registerUser,loginUser,forgotpassword,resetpassword}
