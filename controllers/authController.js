@@ -1,7 +1,8 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
-const crypto=require('crypto')
-const jwt =require('jsonwebtoken')
+const crypto=require('crypto');
+const jwt =require('jsonwebtoken');
+const sendEmail = require('../utils/sendEmail');
 // registering user
 const registerUser=async(req,res)=>{
   const {name,email,password}=req.body
@@ -99,6 +100,10 @@ const forgotpassword =async(req,res)=>{
   await user.save()
 
       const resetUrl = `http://localhost:5000/api/reset-password/${resetToken}`;
+     
+      const message = `Hey ${user.name},\n\nClick the link below to reset your password:\n\n${resetUrl}\n\nThis link will expire in 15 minutes.`;
+
+       await sendEmail(user.email, "Password Reset", message);
 
     res.status(200).json({
       message: 'Password reset link generated',
@@ -109,6 +114,7 @@ const forgotpassword =async(req,res)=>{
     res.status(500).json({ message: 'Error generating reset link' });
   }
 };
+
 //resetpassword
 const resetpassword= async(req,res)=>{
   const{password}= req.body
@@ -117,6 +123,7 @@ const resetpassword= async(req,res)=>{
     .createHash('sha256')
     .update(resetToken)
     .digest('hex')
+
 
     try {
       const user= await User.findOne({
@@ -133,7 +140,7 @@ user.password=await bcrypt.hash(password,salt);
 
 user.resetPasswordExpires=undefined;
 user.resetPasswordToken=undefined;
-await user.save( )
+await user.save()
        res.status(200).json({ message: 'Password updated successfully!' });
   } catch (err) {
     console.error(err);

@@ -1,6 +1,6 @@
 const getProfile = (req,res)=>{
   res.status(200).json({
-    message:"user profile fetched successfully",
+    message:"user profile fetche  d successfully",
     user:req.user,
   })
 };
