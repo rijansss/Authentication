@@ -192,4 +192,4 @@ await user.save()
 };
 
 
-module.exports={registerUser,loginUser,forgotpassword,resetpassword}
+module.exports={registerUser,loginUser,forgotpassword,resetpassword,googleLogin}

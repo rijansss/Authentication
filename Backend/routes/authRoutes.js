@@ -13,6 +13,6 @@ router.post('/login',loginUser);
 router.post('/forgot-password', forgotpassword);
 router.post('/reset-password/:token', resetpassword);
 router.get('/profile', protect, getProfile);
-router.post('/auth/google', googleLogin);
+router.post('/auth/google',googleLogin);
 
 module.exports=router;  
