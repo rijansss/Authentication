@@ -1,15 +1,12 @@
-import React from 'react'
+import React, { useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
 
-const DashBoard = () => {
-  const handleLogout =()=>{
-    localStorage.removeItem('token ');
-    window.location.href='/login';   //redirecting to login page 
-
-  }
+const Dashboard = () => {
+  const{logout}= useContext(AuthContext)
  return (
     <div style={{ padding: '2rem' }}>
       <h2> Welcome to your dashboard, Rijans!</h2>
-      <button onClick={handleLogout}>🚪 Logout</button>
+      <button onClick={logout}>🚪 Logout</button>
     </div>
   );
 };

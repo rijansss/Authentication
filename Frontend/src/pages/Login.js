@@ -1,52 +1,36 @@
-import React, { useState } from "react";
+import React, { useState,useContext} from "react";
 import API from "../utils/api";
+import { AuthContext } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 
 //Login an user
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [form,setForm]=useState({email:"", password:""});
+  const{login}= useContext(AuthContext);  
+    const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      const { data } = await API.post("/login", { email, password });
-      console.log("Login successful:", data);
-      alert("Welcome, " + data.user.name);
-      localStorage.setItem("token", data.token);
-    } catch (err) {
-      alert(err.response?.data?.message || "Login failed");
+
+    const handleSubmit =async(e)=>{
+      e.preventDefault();
+      try {
+          const res = await API.post('/login', form);
+          login(res.data.token)
+             alert('✅ Logged in');
+      navigate('/dashboard');
+      } catch (err) {
+      alert(err.response?.data?.message || 'Login failed');
     }
   };
 
-  return (
-    <div className="p-6 max-w-md mx-auto">
-      <h2 className="text-xl font-bold mb-4">Login</h2>
-      <form onSubmit={handleLogin}>
-        <input
-          type="email"
-          placeholder="Email"
-          onChange={(e) => setEmail(e.target.value)}
-          className="border p-2 w-full mb-2"
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          onChange={(e) => setPassword(e.target.value)}
-          className="border p-2 w-full mb-2"
-        />
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2">
-          Login
-        </button>
-      </form>
-      <p className="mt-4">
-  Don’t have an account? <a href="/register" className="text-blue-500 underline">Register</a>
-</p>
-<p className="mt-2">
-  Forgot password? <a href="/forgot-password" className="text-yellow-500 underline">Reset</a>
-</p>
+ 
 
-    </div>
+   return (
+    <form onSubmit={handleSubmit}>
+      <input placeholder="Email" onChange={(e) => setForm({ ...form, email: e.target.value })} />
+      <input placeholder="Password" onChange={(e) => setForm({ ...form, password: e.target.value })} />
+      <button type="submit">Login</button>
+    </form>
   );
 };
 
