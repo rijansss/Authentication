@@ -26,6 +26,10 @@ const Register = () => {
           onChange={(e) => setForm({ ...form, password: e.target.value })} />
         <button type="submit" className="bg-green-600 text-white px-4 py-2">Register</button>
       </form>
+      <p className="mt-4">
+  Already registered? <a href="/login" className="text-blue-500 underline">Login</a>
+</p>
+
     </div>
   );
 };
