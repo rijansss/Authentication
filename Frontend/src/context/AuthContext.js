@@ -1,6 +1,6 @@
 import { createContext, useState, useEffect } from 'react';
 import decodeToken from '../utils/decodeToken';
-export const AuthContext=createContext();
+export const AuthContext  = createContext();
 
 const AuthProvider=({children})=>{
 
