@@ -5,18 +5,19 @@ export const AuthContext=createContext();
 const AuthProvider=({children})=>{
 
   const[token,setToken]=useState(localStorage.getItem('token'));
-
+  const[userRole,setUserRole]=useState(null)
   //Auto-Logout on expiry
  useEffect(() => {
     if (!token) return;
 
-    const { exp } = decodeToken(token) || {};
+    const { exp,role } = decodeToken(token) || {};
     const now = Date.now() / 1000;
 
     if (exp && exp < now) {
       logout();
       alert("⚠️ Session expired. Please login again.");
     }
+    setUserRole(role)
   }, [token]);
 
     const login = (newToken) => {
@@ -29,7 +30,8 @@ const AuthProvider=({children})=>{
     setToken(null);
   };
   return(
-    <AuthContext.Provider value={{token,login,logout}}>{children} </AuthContext.Provider>
+    <AuthContext.Provider value={{token,login,logout,userRole}}>{children} </AuthContext.Provider>
   )
 }
+
 export default AuthProvider;

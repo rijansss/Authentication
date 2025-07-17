@@ -41,11 +41,6 @@ const googleLogin = async(req,res)=>{
     res.status(400).json({ message: 'Google login failed' });
   }
 };
-
-
-
-
-
 // registering user
 const registerUser=async(req,res)=>{
   const {name,email,password}=req.body
@@ -109,7 +104,7 @@ if(!isMatched) {
   return res.status(400).json({message:"invalid password or email"})
 }
 // if password matched then create JWT token 
-const token = jwt.sign({id:user._id},process.env.JWT_SECRET,{
+const token = jwt.sign({id:user._id, role:user.role},process.env.JWT_SECRET,{
   expiresIn:'7d'
 })
 
