@@ -7,6 +7,9 @@ const { OAuth2Client } = require("google-auth-library");
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+
+
+
 const googleLogin = async (req, res) => {
   const { tokenId } = req.body;
   try {
@@ -37,6 +40,11 @@ const googleLogin = async (req, res) => {
     res.status(400).json({ message: "Google login failed" });
   }
 };
+
+
+
+
+
 // registering user
 const registerUser = async (req, res) => {
   const { name, email, password } = req.body;
@@ -74,6 +82,10 @@ const registerUser = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+
+
+
 //login user
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
@@ -100,6 +112,8 @@ const loginUser = async (req, res) => {
 
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
+    user.refreshTokens.push(refreshToken);
+    await user.save()
 
     // Set refresh token in HttpOnly cookie
     res.cookie("refreshToken", refreshToken, {
@@ -123,6 +137,9 @@ const loginUser = async (req, res) => {
     res.status(500).json({ message: "error while login" });
   }
 };
+
+
+
 //forgotpassword
 const forgotpassword = async (req, res) => {
   const { email } = req.body;
@@ -151,6 +168,8 @@ const forgotpassword = async (req, res) => {
     res.status(500).json({ message: "Error generating reset link" });
   }
 };
+
+
 
 //resetpassword
 const resetpassword = async (req, res) => {
@@ -184,10 +203,41 @@ const resetpassword = async (req, res) => {
   }
 };
 
+
+//Log out from every device
+const logoutall =async(req,res)=>{
+ try {
+    const user = await User.findById(req.user._id);
+    user.refreshTokens = []; // clear all tokens
+    await user.save();
+    res.status(200).json({ message: "Logged out from all devices" });
+  } catch (err) {
+    res.status(500).json({ message: "Logout failed", error: err.message });
+  }
+};
+
+
+
+//Log out from a single device
+const logout = async(req,res)=>{
+try {
+  const refreshToken=req.body.refreshToken;
+  const user=await User.findById(req.user._id);
+ user.refreshTokens = user.refreshTokens.filter((token) => token !== refreshToken);
+    await user.save();
+
+    res.status(200).json({ message: "Logged out successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Logout failed", error: err.message });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
   forgotpassword,
   resetpassword,
   googleLogin,
+  logoutall,
+  logout
 };
